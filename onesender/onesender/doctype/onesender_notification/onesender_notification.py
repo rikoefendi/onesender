@@ -34,7 +34,7 @@ class OnesenderNotification(Document):
         """Specific to API endpoint Server Scripts."""
         if self.condition:
             safe_exec(
-                self.condition, get_safe_globals(), dict(doc=self)
+                self.condition, get_safe_globals(), dict(doc=self, extract_phone=extract_phone)
             )
             data_list = self.get("_data_list") or []
             for dl in data_list:
@@ -134,3 +134,16 @@ class OnesenderNotification(Document):
             self.notify_message(doc, phone_no=phone)
             # print(doc.name)
 
+
+# safe_eval pre define function
+
+import re
+
+def extract_phone(text: str):
+    if not text:
+        return None
+
+    match = re.search(r'Phone:\s*([0-9+]+)', text)
+    if match:
+        return match.group(1)
+    return None

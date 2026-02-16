@@ -9,7 +9,7 @@ const save_send_message = async (frm) => {
 				freeze: true,
 				callback(r) {
 					if (r.message) {
-						frappe.msgprint(r.message);
+						// frappe.msgprint(r.message);
 						frm.reload_doc();
 					}
 				}

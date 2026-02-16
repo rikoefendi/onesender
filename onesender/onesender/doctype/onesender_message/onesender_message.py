@@ -10,6 +10,8 @@ from frappe.utils import get_request_session
 
 class OnesenderMessage(Document):
     """Send Onesender messages."""
+    is_event: bool = False
+
     def validate(self):
         """validate attach"""
         if self.attach_with_doctype == 1 and self.content_type not in ["Image", "Document"]:
@@ -41,8 +43,8 @@ class OnesenderMessage(Document):
                 "to": self.format_number(self.to),
             }
             # generate attach link
+            link = ""
             filename = self.name
-            link = frappe.utils.get_url()
             if self.attach_with_doctype:
                 doctype = frappe.get_doc("DocType", self.attach_doctype)
                 doc = frappe.get_doc(self.attach_doctype, self.attach_docname)
@@ -52,21 +54,21 @@ class OnesenderMessage(Document):
 
                 attach_type = "pdf"
                 if self.content_type == "Image":
-                    attach_type = "image"
+                    attach_type = "png"
                 
-                attach_link = get_attach_doctype_link(
+                filename = self.attach_document_name or doc.name
+                link = get_attach_doctype_link(
                         doctype.name,
                         doc.name,
                         filename=filename,
-                        attach_type=attach_type
+                        attach_type=attach_type,
+                        key=key
                     )
                 
-                filename = self.attach_document_name or doc.name
-                link += f"{attach_link}&key={key}"
                 
             if self.attach and not self.attach_with_doctype:
                 filename = self.attach_document_name or self.attach.split("/")[-1]
-                link += self.attach
+                link += frappe.utils.get_url() + self.attach
 
             data_attach["type"] = self.content_type.lower()
             data_attach[self.content_type.lower()] = {
@@ -90,12 +92,17 @@ class OnesenderMessage(Document):
                 self.notify(device, data_attach)
             self.status = "Complete"
             self.details = ""
+            frappe.msgprint("Onesender: Success send message", "Onesender message", indicator="green", alert=True)
         except Exception as e:
             self.details = str(e)
             self.status = "Failed"
             self.save()
             frappe.db.commit()
-            frappe.throw(str(e), title="Send Message Failed", exc=e)
+
+            if self.is_event:
+                frappe.msgprint("Onesender: " +str(e), title="Onesender Message", indicator="red", alert=True)
+            else:
+                frappe.throw(str(e), title="Onesender Message", exc=e)
         finally:
             # print(device.name)
             sender = ""
@@ -120,7 +127,7 @@ class OnesenderMessage(Document):
             data=json.dumps(data)
         )
         if response["code"] != 200:
-            frappe.throw(msg=json.dumps(response), title="Send Message Onesender Fail")
+            raise OnesenderError(json.dumps(response))
 
     def get_device(self, default = False):
         dt = "Onesender Device"
@@ -152,6 +159,10 @@ class OnesenderMessage(Document):
 
         table = frappe.qb.DocType("Onesender Message")
         frappe.db.delete(table, filters=(table.modified < (Now() - Interval(days=days)) and table.status == "Complete"))
+
+
+class OnesenderError(Exception):
+    pass
 
 @frappe.whitelist()
 def resend_message(docname = ""):

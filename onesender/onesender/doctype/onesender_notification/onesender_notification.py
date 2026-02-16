@@ -97,7 +97,8 @@ class OnesenderNotification(Document):
             "attach_docname": attach_docname,
             "attach_document_name": render_template(self.attach_document_name, {"doc": doc}),
             "caption": render_template(self.caption, {"doc": doc}),
-            "onesender_notification": self.name
+            "onesender_notification": self.name,
+            "is_event": True
         }).insert()
 
     def format_number(self, number):

@@ -152,8 +152,14 @@ def trigger_onesender_notification_today():
             continue  # safely continue even if one fails
     return len(doc_list)
 
-def get_attach_doctype_link(doctype, docname, print_format="", no_letterhead=0, filename = None, attach_type: Literal["pdf", "image"] = "pdf"):
-    return frappe.utils.quote_urls(f"/api/method/onesender.attach_doctype.download_{attach_type}?doctype={doctype}&name={docname}&format={print_format}&no_letterhead={no_letterhead}&filename={filename}")
+from pdf_generator.page_renderer import build_url
+def get_attach_doctype_link(doctype, docname, print_format="", no_letterhead=0, key: str = None, filename : str = None, attach_type: Literal["pdf", "png"] = "pdf"):
+    return build_url(doctype, docname, {
+        "print_format": print_format,
+        "no_letterhead": no_letterhead,
+        "key": key,
+        "filename": filename
+    }, ext=attach_type)
 
 
 

@@ -71,10 +71,10 @@
   {
    "depends_on": "eval:(doc.attach_with_doctype == 1)",
    "fieldname": "attach_docname",
-   "fieldtype": "Link",
+   "fieldtype": "Dynamic Link",
    "label": "Choose DocName",
    "mandatory_depends_on": "eval:(doc.attach_with_doctype == 1)",
-   "options": "User"
+   "options": "attach_doctype"
   },
   {
    "fieldname": "onesender_notification",

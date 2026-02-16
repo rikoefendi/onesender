@@ -154,10 +154,7 @@ def trigger_onesender_notification_today():
 
 from onesender.pdf_generator.page_renderer import build_url
 def get_attach_doctype_link(doctype, docname, print_format="", no_letterhead=0, key: str = None, filename : str = None, attach_type: Literal["pdf", "jpeg"] = "pdf"):
-    print_format = (
-        frappe.get_cached_value("DocType", doctype, "default_print_format")
-        or "Standard"
-    )
+    print_format = frappe.get_meta(doctype).default_print_format
     return build_url(doctype, docname, {
         "format": print_format,
         "no_letterhead": no_letterhead,

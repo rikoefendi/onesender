@@ -52,6 +52,10 @@ def setup_custom_fields():
 @filelock("pdf_generator_playwright_setup", timeout=60, is_global=True)
 def setup_playwright():
 	python = sys.executable
+	# ----------------------------------------------------------
+	# Resolve CLI
+	# ----------------------------------------------------------
+	playwright_cmd = resolve_playwright_cmd(python)
 	
 	if is_playwright_installed(python) and is_chromium_installed(playwright_cmd):
 		frappe.logger().info("Playwright + Chromium already installed. Skipping setup.")
@@ -70,10 +74,6 @@ def setup_playwright():
 	else:
 		frappe.logger().info("Playwright python package already installed")
 
-	# ----------------------------------------------------------
-	# Resolve CLI
-	# ----------------------------------------------------------
-	playwright_cmd = resolve_playwright_cmd(python)
 
 	# ----------------------------------------------------------
 	# 2. Chromium browser

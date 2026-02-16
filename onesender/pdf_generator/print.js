@@ -72,6 +72,11 @@ frappe.ui.form.PrintView = class PrintView extends frappe.ui.form.PrintView {
 	}
 	preview() {
 		super.preview();
+		this.wrapper.find('.print-preview').css({
+			maxWidth: "100%",
+			maxHeight: "100%",
+			width: "auto"
+		})
 	}
 	get_print_html(callback) {
 		let print_format = this.get_print_format();

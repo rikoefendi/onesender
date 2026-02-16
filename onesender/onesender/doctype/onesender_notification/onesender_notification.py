@@ -35,7 +35,7 @@ class OnesenderNotification(Document):
             elif not recipient.is_field:
                 recipients.append(self.format_number(recipient.phone))
 
-        for recipient in self._recipients or []:
+        for recipient in self.get("_recipients") or []:
             recipients.append(self.format_number(recipient))
 
         return list({r for r in recipients if r})

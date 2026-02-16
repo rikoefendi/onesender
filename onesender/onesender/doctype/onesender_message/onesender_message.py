@@ -54,7 +54,7 @@ class OnesenderMessage(Document):
 
                 attach_type = "pdf"
                 if self.content_type == "Image":
-                    attach_type = "png"
+                    attach_type = "jpeg"
                 
                 filename = self.attach_document_name or doc.name
                 link = get_attach_doctype_link(

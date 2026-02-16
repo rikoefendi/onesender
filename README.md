@@ -1,33 +1,123 @@
-### Frappe Onesender
+# OneSender
 
-Frappe integration Onesender(Wa Api Gateway)
+OneSender is a Frappe application providing:
 
-### Installation
+1.  WhatsApp API integration
+2.  Chromium-based PDF and image generation
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+This app is designed for ERPNext / Frappe environments and replaces
+legacy wkhtmltopdf rendering with a modern Playwright (Chromium) engine.
 
-```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch develop
+------------------------------------------------------------------------
+
+# Features
+
+## 1. WhatsApp Integration
+
+-   Send WhatsApp messages via API gateway
+-   Designed for automation inside Frappe
+-   Can be used in:
+    -   DocType events
+    -   Server scripts
+    -   Scheduled jobs
+    -   Custom API endpoints
+
+------------------------------------------------------------------------
+
+## 2. PDF Generator (Chromium Engine)
+
+Location: onesender/pdf_generator/
+
+Capabilities:
+
+-   Generate PDF
+-   Generate PNG
+-   Generate JPEG
+-   Full modern CSS support (Flexbox, Grid)
+-   Custom `@pdf {}` CSS rule support
+
+This engine does NOT rely on wkhtmltopdf.
+
+------------------------------------------------------------------------
+
+# Installation
+
+Inside your bench:
+
+bench get-app https://github.com/rikoefendi/onesender --branch main
 bench install-app onesender
+
+------------------------------------------------------------------------
+
+# Playwright Requirement (For PDF Engine)
+
+Install Playwright:
+
+pip install playwright playwright install
+
+Chromium will be downloaded automatically.
+
+------------------------------------------------------------------------
+
+# Architecture
+
+## WhatsApp Flow
+
+Frappe Event → OneSender → External WhatsApp API → Message Delivery
+
+## PDF Flow
+
+Frappe HTML → onesender.pdf_generator.generate() → Chromium → PDF/Image
+bytes
+
+------------------------------------------------------------------------
+
+# Important Notes
+
+-   `frappe.print_settings` is NOT used.
+-   Margins, page size, header, and footer must be defined using CSS.
+-   wkhtmltopdf settings are ignored.
+-   Always define page layout using `@page` or `@pdf`.
+
+------------------------------------------------------------------------
+
+# CSS Example
+
+```{=html}
+<style>
+@pdf {
+  size: A4 portrait;
+  margin: 8mm;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+</style>
 ```
 
-### Contributing
+------------------------------------------------------------------------
 
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
+# Output Types
 
-```bash
-cd apps/onesender
-pre-commit install
-```
+  Type   Method
+  ------ ----------------------
+  PDF    Chromium PDF engine
+  PNG    Full-page screenshot
+  JPEG   Full-page screenshot
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
+------------------------------------------------------------------------
 
-- ruff
-- eslint
-- prettier
-- pyupgrade
+# Production Recommendations
 
-### License
+-   Ensure HTML is self-contained.
+-   Explicitly define margins and page size.
+-   Test memory usage for large documents.
+-   Run Playwright in a controlled server environment.
 
-unlicense
+------------------------------------------------------------------------
+
+# License
+
+Private and proprietary. See LICENSE file.

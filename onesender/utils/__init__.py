@@ -153,7 +153,7 @@ def trigger_onesender_notification_today():
     return len(doc_list)
 
 from pdf_generator.page_renderer import build_url
-def get_attach_doctype_link(doctype, docname, print_format="", no_letterhead=0, key: str = None, filename : str = None, attach_type: Literal["pdf", "png"] = "pdf"):
+def get_attach_doctype_link(doctype, docname, print_format="", no_letterhead=0, key: str = None, filename : str = None, attach_type: Literal["pdf", "jpeg"] = "pdf"):
     return build_url(doctype, docname, {
         "print_format": print_format,
         "no_letterhead": no_letterhead,

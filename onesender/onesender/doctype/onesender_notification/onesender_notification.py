@@ -69,7 +69,7 @@ class OnesenderNotification(Document):
             if self.condition and not ignore_condition:
                 # check if condition satisfies
                 if not frappe.safe_eval(
-                    self.condition, get_safe_globals(), dict(doc=doc_data)
+                    self.condition, get_safe_globals(), dict(doc=doc_data, extract_phone=extract_phone)
                 ):
                     return
 

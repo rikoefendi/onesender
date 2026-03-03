@@ -35,7 +35,7 @@ def _wkhtmltopdf(print_format, html, options, output, pdf_generator=None):
     if pdf_generator != "wkhtmltopdf":
         return None
     
-    if output in ["jpeg", "png"]:
+    if output == "jpeg":
         return render(html, output)
     else:
         from frappe.utils.pdf import get_pdf

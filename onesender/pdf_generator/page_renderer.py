@@ -2,6 +2,7 @@ import re
 import json
 import base64
 from typing import Dict, Literal
+from pypdf import PdfWriter
 
 import frappe
 from frappe.utils import get_url
@@ -12,12 +13,11 @@ from werkzeug.wrappers import Response
 from frappe.exceptions import DoesNotExistError, PermissionError
 from onesender.pdf_generator.browser import render
 ATTACH_PATTERN = re.compile(
-    r"^/attach/[^/]+/[^/]+/[^/]+\.(pdf|jpeg|png)$"
+    r"^/attach/[^/]+/[^/]+/[^/]+\.(pdf|jpeg)$"
 )
-ALLOWED_EXT = ["pdf", "jpeg", "png"]
+ALLOWED_EXT = ["pdf", "jpeg"]
 MIMES = {
     "pdf": "application/pdf",
-    "png": "image/png",
     "jpeg": "image/jpeg"
 }
 
@@ -52,12 +52,8 @@ class PageRenderer(BaseRenderer):
             # get document
             doc = frappe.get_doc(doctype, name)
             as_pdf = True
-            if pdf_generator == "wkhtmltopdf" or pdf_generator == None:
-                if ext in ["jpeg", "png"]:
-                    as_pdf = False
-                else:
-                    ext = None
-                    as_pdf = True
+            if ext != "pdf":
+                as_pdf = False
             # validate permission
             validate_print_permission(doc)
 
@@ -67,7 +63,6 @@ class PageRenderer(BaseRenderer):
                     name,
                     print_format=options.get("format"),
                     doc=doc,
-                    output=ext,
                     as_pdf=as_pdf,
                     letterhead=options.get("letterhead"),
                     no_letterhead=options.get("no_letterhead"),
@@ -98,7 +93,6 @@ class PageRenderer(BaseRenderer):
             )
 
         except Exception:
-            print(frappe.get_traceback())
             frappe.log_error(frappe.get_traceback(), "Attach Renderer Error")
 
             return Response(
@@ -118,7 +112,7 @@ def build_url(
     doctype: str,
     docname: str,
     options: Dict,
-    ext: Literal["pdf", "jpeg", "png"] = "pdf"
+    ext: Literal["pdf", "jpeg"] = "pdf"
 ) -> str:
 
     if ext not in ALLOWED_EXT:

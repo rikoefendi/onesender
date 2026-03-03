@@ -11,7 +11,7 @@ from frappe.utils.jinja_globals import is_rtl
 from frappe.www.printview import set_link_titles, get_print_format_doc, get_rendered_template, trigger_print_script, get_font
 if TYPE_CHECKING:
 	from frappe.printing.doctype.print_format.print_format import PrintFormat
-
+from frappe.utils.jinja import render_template
 no_cache = 1
 
 
@@ -100,7 +100,9 @@ def get_print_style(
 		"print_style": style,
 		"font": get_font(print_settings, print_format, for_legacy),
 	}
-	pdf_generator = print_format.get("pdf_generator", "wkhtmltopdf")
+	pdf_generator = "wkhtmltopdf"
+	if print_format:
+		pdf_generator = print_format.get("pdf_generator")
 	css = ""
 	if pdf_generator == "tekma":
 		css += frappe.get_template("pdf_generator/tekma.css").render(context)
@@ -118,7 +120,7 @@ def get_print_style(
 
 	if print_format and print_format.css:
 		css += "\n\n" + print_format.css
-
+	css = render_template(css, context)
 	return css
 
 @frappe.whitelist()

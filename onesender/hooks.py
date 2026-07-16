@@ -76,3 +76,7 @@ after_install = "onesender.pdf_generator.install.after_install"
 before_uninstall = "onesender.pdf_generator.uninstall.before_uninstall"
 
 page_js = {"print" : "pdf_generator/print.js"}
+
+jinja = {
+    "methods": ["onesender.utils.get_sales_person", "onesender.utils.get_sales_persons"],
+}

@@ -165,5 +165,70 @@ def get_attach_doctype_link(doctype, docname, print_format="", no_letterhead=0, 
 
 
 
+def get_sales_persons(sales_team=None):
+    print("called")
+    sales_team = sales_team or []
 
+    return [
+        get_sales_person(row.sales_person)
+        for row in sales_team
+        if row.sales_person
+    ]
 
+def get_sales_person(sales_person):
+    if not sales_person:
+        return None
+
+    sales_person_data = frappe.db.get_value(
+        "Sales Person",
+        sales_person,
+        [
+            "name",
+            "sales_person_name",
+            "employee",
+            "parent_sales_person",
+            "is_group",
+            "enabled",
+            "department",
+            "commission_rate",
+        ],
+        as_dict=True,
+    )
+
+    if not sales_person_data:
+        return None
+
+    employee_data = None
+
+    if sales_person_data.employee:
+        employee_data = frappe.db.get_value(
+            "Employee",
+            sales_person_data.employee,
+            [
+                "name",
+                "employee_name",
+                "employee_number",
+                "user_id",
+                "company",
+                "status",
+                "gender",
+                "date_of_birth",
+                "date_of_joining",
+                "department",
+                "designation",
+                "branch",
+                "reports_to",
+                "cell_number",
+                "personal_email",
+                "company_email",
+                "prefered_contact_email",
+                "holiday_list",
+                "image",
+            ],
+            as_dict=True,
+        )
+
+    return frappe._dict({
+        "sales_person": sales_person_data,
+        "employee": employee_data,
+    })
